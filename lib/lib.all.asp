@@ -136,6 +136,8 @@ function re_char(x,y,z)
   re_char=x
  end if
 end function
+'--
+
 '-测试函数语句-
 'sc esql("UserInfo","Username:stupboy|password:123456")
 %>
