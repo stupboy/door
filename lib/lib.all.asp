@@ -71,13 +71,19 @@ function str_x(x,y)
 end function
 '-日期转字符函数 1为到日 2为到秒-
 function date2str(x,y) 
- a=right(year(x),2)
- if y=1 then 
- date2str=a&str_x(month(x),2)&str_x(day(x),2)
- elseif y=2 then 
- date2str=a&str_x(month(x),2)&str_x(day(x),2)&str_x(hour(x),2)&str_x(minute(x),2)&str_x(second(x),2)
- elseif y=3 then '-如果等于3则转为8位数日期格式年月日-
- date2str=year(x)&str_x(month(x),2)&str_x(day(x),2)
+ if x="" then 
+ date2str=""
+ elseif isDate(x) then 
+  a=right(year(x),2)
+  if y=1 then 
+  date2str=a&str_x(month(x),2)&str_x(day(x),2)
+  elseif y=2 then 
+  date2str=a&str_x(month(x),2)&str_x(day(x),2)&str_x(hour(x),2)&str_x(minute(x),2)&str_x(second(x),2)
+  elseif y=3 then '-如果等于3则转为8位数日期格式年月日-
+  date2str=year(x)&str_x(month(x),2)&str_x(day(x),2)
+  end if 
+ else 
+  date2str=x
  end if 
 end function
 '-单号生成函数-

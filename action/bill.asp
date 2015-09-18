@@ -53,6 +53,7 @@ end if
 <title>销售管理系统</title>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
 <link href="../images/main.css" rel="stylesheet" type="text/css">
+<script language="JavaScript" type="text/javascript" src="../Date/WdatePicker.js"></script>
 <script language=JavaScript type=text/JavaScript>
 function CheckAll(form)
 {for (var i=0;i<form.elements.length;i++){
@@ -242,7 +243,20 @@ else
         %>
       </table><br>
 <%end if%>
-<%if action="list" then%>
+<%
+if action="list" then
+'-init search condition
+stime0=date2str(now()-7,3)
+etime0=date2str(now(),3)
+'-request the condition
+stime=date2str(Request("stime"),3) '-start date-
+etime=date2str(Request("etime"),3) '-end date-
+'-初始SQL 默认查询近一周-
+ sql="select * from DP_SS_view where p_view_param.set_v1('"&stime0&"')='"&stime0&"' and p_view_param.set_v2('"&etime0&"')='"&etime0&"' and 店名='湖里旗舰店' order by 款号,颜色,标志 desc,合计 desc "
+if etime>stime and etime<>"" and stime<>"" then '-IF THE SEARCH DATE NOT NULL-
+ sql="select * from DP_SS_view where p_view_param.set_v1('"&stime&"')='"&stime&"' and p_view_param.set_v2('"&etime&"')='"&etime&"' and 店名='湖里旗舰店' and 款号||颜色 in (select distinct 款号||颜色 from rp_retai_jwy where 店名='湖里旗舰店' and billdate between '"&stime&"' and '"&etime&"' )  order by 款号,颜色,标志 desc,合计 desc "
+end if 
+%>
 <br>
   <table width="96%"  border="0" align="center" cellpadding="4" cellspacing="1" bgcolor="#aec3de">
         <tr align="center" bgcolor="#F2FDFF">
@@ -250,9 +264,12 @@ else
         </tr>
 	    <tr  align="center" bgcolor="#F2FDFF">
 	     <form name="search" method="get" action="bill.asp">
-         <td height="30" colspan="25"><input name="action" type="text" id="action" value="list" style="display:none" size="30">客户：<input name="kehu" type="text" id="kehu" size="15"> | 款号：<input name="kuan" type="text" id="kuan" size="15"> 
-              | 未销售<input name="t" type="checkbox" id="t" /> | <input name="Query" type="submit" id="Query" value="查 询">*默认查询近1周数据</td>
-          </form>
+         <td height="30" colspan="25">
+		 <input name="action" type="text" id="action" value="list" style="display:none" size="30">
+		 开始日期:<input name="stime" type="text" id="stime" size="15" onfocus="WdatePicker({isShowWeek:true})" readonly="readonly" value="<%=stime%>"/> 
+		 |结束日期:<input name="etime" type="text" id="etime" size="15" onfocus="WdatePicker({isShowWeek:true})" readonly="readonly" value="<%=etime%>"/> 
+         |未销售<input name="t" type="checkbox" id="t" /> | <input name="Query" type="submit" id="Query" value="查 询">*默认查询近1周数据</td>
+         </form>
 	    </tr>
         <tr align="center" bgcolor="#ebf0f7">
 		  <td width="3%">选中</td>
@@ -282,7 +299,7 @@ else
 		  <td width="3%">操作</td>
         </tr>	
 <%
- sql="select * from DP_SS_view where p_view_param.set_v1('20150901')='20150901' and p_view_param.set_v2('20150916')='20150916' and 店名='湖里旗舰店' order by 款号,颜色,标志 desc,合计 desc "
+ 
  set rs=server.createobject("adodb.recordset") 
  rs.open sql,conn1,1,1
  if not rs.eof then
@@ -348,12 +365,12 @@ next
 		  <font color="#ff0000"><%=proCount%></font>条商品信息, 当前页：
 		  <font color="#ff0000"><%=intCurPage%> </font>
 		  <%if intCurPage<>1 then%>
-		  <a href="?action=list">首页</a> | 
-		  <a href="?action=list&ToPage=<%=intCurPage-1%>">上一页</a> | 
+		  <a href="?action=list&stime=<%=stime%>&etime=<%=etime%>">首页</a> | 
+		  <a href="?action=list&ToPage=<%=intCurPage-1%>&stime=<%=stime%>&etime=<%=etime%>">上一页</a> | 
 		  <% end if
              if intCurPage<>rs.PageCount then %>
-          <a href="?action=list&ToPage=<%=intCurPage+1%>">下一页</a> | 
-		  <a href="?action=list&ToPage=<%=rs.PageCount%>"> 最后页</a>
+          <a href="?action=list&ToPage=<%=intCurPage+1%>&stime=<%=stime%>&etime=<%=etime%>">下一页</a> | 
+		  <a href="?action=list&ToPage=<%=rs.PageCount%>&stime=<%=stime%>&etime=<%=etime%>"> 最后页</a>
 		  <% end if%>
 		  </span>
 		  </td>
